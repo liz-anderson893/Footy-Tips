@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Family Footy Tips 🏉</title>
+<title>Gormanson Family Footy Tips 🏉</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -139,6 +139,11 @@
   .maths-tally-section p { font-size:0.75rem; color:rgba(249,247,242,0.4); margin-bottom:14px; }
   .maths-tally-grid { display:flex; flex-direction:column; gap:10px; }
   .maths-tally-row { display:grid; grid-template-columns:80px 1fr auto auto; align-items:center; gap:10px; }
+  .maths-sum-row { display:grid; grid-template-columns:80px 1fr auto auto; align-items:center; gap:10px; margin-bottom:10px; }
+  .maths-sum-equation { font-size:0.9rem; font-weight:700; color:rgba(249,247,242,0.7); font-family:'Inter',monospace; }
+  .maths-running-eq { font-size:0.8rem; color:rgba(249,247,242,0.6); line-height:1.4; }
+  .prev-pts { color:rgba(249,247,242,0.5); font-weight:600; }
+  .this-pts { color:var(--gold); font-weight:700; }
 
   .check-all-btn { width:100%; margin-top:16px; padding:13px; background:var(--gold); border:none; border-radius:12px; color:var(--dark); font-family:'Inter',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:background 0.2s; }
   .check-all-btn:hover { background:var(--gold-dark); }
@@ -182,7 +187,7 @@
 <div class="app">
   <header>
     <span class="header-emoji">🏉</span>
-    <h1>Family Footy Tips</h1>
+    <h1>Gormanson Family Footy Tips</h1>
     <p>2026 AFL Season</p>
   </header>
 
@@ -477,59 +482,67 @@ async function renderMathsWorksheet() {
     html += `</div></div>`;
   });
 
-  // Weekly totals
-  html += `<div class="maths-totals-section">
-    <h3>Round Total</h3>
-    <p style="font-size:0.75rem;color:rgba(249,247,242,0.4);margin-bottom:14px">Add up all the points above for each person this round</p>
-    <div class="maths-totals-grid">`;
-
-  PLAYERS.forEach(p => {
-    // Calculate real total for this round
-    let realTotal = 0;
-    rdata.games.forEach((_,i) => {
-      const g = (dbData[currentMathsRound]||{})[i]||{};
-      if (g.winner && g[p] && g[p]===g.winner) realTotal+=2;
-    });
-    html += `<div class="maths-total-row">
-      <div class="maths-total-label ${p}">${LABELS[p]}</div>
-      <div class="maths-hint">= ? pts this round</div>
-      <input class="maths-total-input" type="number" min="0" inputmode="numeric"
-        placeholder="?" data-correct="${realTotal}" data-type="weekly" data-player="${p}"
-        onchange="checkTotalInput(this)" value="">
-      <div class="maths-check-icon" id="wticon-${p}"></div>
-    </div>`;
-  });
-  html += `</div></div>`;
-
-  // Running tally
-  // Calculate real running totals up to and including this round
+  // Calculate per-round totals and running totals
   const roundIdx = ROUND_KEYS.indexOf(currentMathsRound);
-  const prevRounds = ROUND_KEYS.slice(0, roundIdx+1);
-  const runningTotals = { mum:0, dad:0, jack:0 };
+  const prevRounds = ROUND_KEYS.slice(0, roundIdx); // rounds BEFORE this one
+  const prevTotals = { mum:0, dad:0, jack:0 };
   prevRounds.forEach(rk => {
     FIXTURE[rk].games.forEach((_,i) => {
       const g = (dbData[rk]||{})[i]||{};
-      if (g.winner) PLAYERS.forEach(p => { if (g[p]===g.winner) runningTotals[p]+=2; });
+      if (g.winner) PLAYERS.forEach(p => { if (g[p]===g.winner) prevTotals[p]+=2; });
     });
   });
 
-  html += `<div class="maths-tally-section">
-    <h3>Running Total 🏆</h3>
-    <p>Add this round's points to the total from all previous rounds</p>
-    <div class="maths-tally-grid">`;
-
-  PLAYERS.forEach(p => {
-    html += `<div class="maths-tally-row">
-      <div class="maths-total-label ${p}">${LABELS[p]}</div>
-      <div class="maths-hint">= ? pts total</div>
-      <input class="maths-total-input" type="number" min="0" inputmode="numeric"
-        placeholder="?" data-correct="${runningTotals[p]}" data-type="running" data-player="${p}"
-        onchange="checkTotalInput(this)" value="">
-      <div class="maths-check-icon" id="rticon-${p}"></div>
-    </div>`;
+  const thisRoundTotals = { mum:0, dad:0, jack:0 };
+  rdata.games.forEach((_,i) => {
+    const g = (dbData[currentMathsRound]||{})[i]||{};
+    if (g.winner) PLAYERS.forEach(p => { if (g[p]===g.winner) thisRoundTotals[p]+=2; });
   });
 
-  html += `</div></div>`;
+  const runningTotals = { mum: prevTotals.mum + thisRoundTotals.mum, dad: prevTotals.dad + thisRoundTotals.dad, jack: prevTotals.jack + thisRoundTotals.jack };
+
+  // Summary adding-up section
+  html += '<div class="maths-totals-section"><h3>Add It Up 🧮</h3>';
+  html += '<p style="font-size:0.75rem;color:rgba(249,247,242,0.4);margin-bottom:16px">Here are all the points for this round — add them up for each person</p>';
+
+  PLAYERS.forEach(p => {
+    const pointsList = [];
+    rdata.games.forEach((_,i) => {
+      const g = (dbData[currentMathsRound]||{})[i]||{};
+      if (!g.winner || !g[p]) return;
+      pointsList.push(g[p]===g.winner ? 2 : 0);
+    });
+    if (pointsList.length === 0) return;
+    const addStr = pointsList.join(' + ');
+    html += '<div class="maths-sum-row">' +
+      '<div class="maths-total-label ' + p + '">' + LABELS[p] + '</div>' +
+      '<div class="maths-sum-equation">' + addStr + ' = </div>' +
+      '<input class="maths-total-input" type="number" min="0" inputmode="numeric"' +
+      ' placeholder="?" data-correct="' + thisRoundTotals[p] + '" data-type="weekly" data-player="' + p + '"' +
+      ' onchange="checkTotalInput(this)" value="">' +
+      '<div class="maths-check-icon" id="wticon-' + p + '"></div>' +
+      '</div>';
+  });
+  html += '</div>';
+
+  // Running tally
+  html += '<div class="maths-tally-section"><h3>Running Total 🏆</h3>';
+  html += '<p>Add this round\'s total to the previous total</p>';
+  html += '<div class="maths-tally-grid">';
+
+  PLAYERS.forEach(p => {
+    const prev = prevTotals[p];
+    const thisRound = thisRoundTotals[p];
+    html += '<div class="maths-tally-row">' +
+      '<div class="maths-total-label ' + p + '">' + LABELS[p] + '</div>' +
+      '<div class="maths-running-eq"><span class="prev-pts">' + prev + ' pts before</span> + <span class="this-pts">' + thisRound + ' pts this round</span> = </div>' +
+      '<input class="maths-total-input" type="number" min="0" inputmode="numeric"' +
+      ' placeholder="?" data-correct="' + runningTotals[p] + '" data-type="running" data-player="' + p + '"' +
+      ' onchange="checkTotalInput(this)" value="">' +
+      '<div class="maths-check-icon" id="rticon-' + p + '"></div>' +
+      '</div>';
+  });
+  html += '</div></div>';
   html += `<button class="check-all-btn" onclick="checkAll()">✅ Check All My Answers</button>`;
   html += `<div class="maths-score-banner" id="mathsScoreBanner"></div>`;
 
