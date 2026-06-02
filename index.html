@@ -276,31 +276,40 @@ let dbData = {};
 let saveTimer = null;
 
 // ── Supabase ──────────────────────────────────────────────────────────────
-async function dbFetch(path, opts={}) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: { 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}`, 'Content-Type':'application/json', 'Prefer':'return=minimal', ...opts.headers },
-    ...opts
-  });
-  if (!opts.method || opts.method==='GET') return res.ok ? res.json() : [];
-  return res.ok;
+async function loadAllTips() {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/tips?select=round,game_index,player,tip,winner', {
+      method: 'GET',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' }
+    });
+    const rows = res.ok ? await res.json() : [];
+    dbData = {};
+    (rows||[]).forEach(r => {
+      if (!dbData[r.round]) dbData[r.round] = {};
+      if (!dbData[r.round][r.game_index]) dbData[r.round][r.game_index] = {};
+      if (r.player==='winner') dbData[r.round][r.game_index].winner = r.winner;
+      else dbData[r.round][r.game_index][r.player] = r.tip;
+    });
+  } catch(e) { console.error('loadAllTips error', e); }
 }
 
-async function loadAllTips() {
-  const rows = await dbFetch('tips?select=round,game_index,player,tip,winner', { method:'GET', headers:{'Prefer':''} });
-  dbData = {};
-  (rows||[]).forEach(r => {
-    if (!dbData[r.round]) dbData[r.round] = {};
-    if (!dbData[r.round][r.game_index]) dbData[r.round][r.game_index] = {};
-    if (r.player==='winner') dbData[r.round][r.game_index].winner = r.winner;
-    else dbData[r.round][r.game_index][r.player] = r.tip;
-  });
+async function dbFetch(path, opts={}) {
+  try {
+    const method = opts.method || 'POST';
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+      method,
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': opts.prefer || 'resolution=merge-duplicates,return=minimal' },
+      body: opts.body
+    });
+    return res.ok;
+  } catch(e) { console.error('dbFetch error', e); return false; }
 }
 
 async function saveTip(round, gameIndex, player, tip) {
-  await dbFetch('tips', { method:'POST', headers:{'Prefer':'resolution=merge-duplicates,return=minimal'}, body:JSON.stringify({ round, game_index:gameIndex, player, tip, winner:null, updated_at:new Date().toISOString() }) });
+  await dbFetch('tips', { body: JSON.stringify({ round, game_index:gameIndex, player, tip, winner:null, updated_at:new Date().toISOString() }) });
 }
 async function saveWinner(round, gameIndex, winner) {
-  await dbFetch('tips', { method:'POST', headers:{'Prefer':'resolution=merge-duplicates,return=minimal'}, body:JSON.stringify({ round, game_index:gameIndex, player:'winner', tip:null, winner, updated_at:new Date().toISOString() }) });
+  await dbFetch('tips', { body: JSON.stringify({ round, game_index:gameIndex, player:'winner', tip:null, winner, updated_at:new Date().toISOString() }) });
 }
 
 // ── Player ────────────────────────────────────────────────────────────────
