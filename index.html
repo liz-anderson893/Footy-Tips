@@ -7,147 +7,175 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --gold: #f5c518;
-    --gold-dark: #d4a80f;
-    --white: #f9f7f2;
-    --dark: #111;
-    --mid: #2a2a2a;
-    --card: #1e1e1e;
+    --gold: #f5c518; --gold-dark: #d4a80f;
+    --white: #f9f7f2; --dark: #111; --mid: #2a2a2a; --card: #1e1e1e;
     --border: rgba(245,197,24,0.2);
-    --mum: #e84393;
-    --dad: #3b82f6;
-    --jack: #10b981;
+    --mum: #e84393; --dad: #3b82f6; --jack: #10b981;
+    --correct: #10b981; --wrong: #ef4444;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--dark); color: var(--white); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,255,255,0.015) 60px,rgba(255,255,255,0.015) 61px); pointer-events: none; z-index: 0; }
-  .app { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 16px 12px 60px; }
+  body::before { content:''; position:fixed; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,255,255,0.015) 60px,rgba(255,255,255,0.015) 61px); pointer-events:none; z-index:0; }
+  .app { position:relative; z-index:1; max-width:640px; margin:0 auto; padding:16px 12px 60px; }
 
-  header { text-align: center; padding: 24px 0 20px; border-bottom: 2px solid var(--gold); margin-bottom: 24px; }
-  .header-emoji { font-size: 2.4rem; display: block; margin-bottom: 4px; }
-  header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem, 8vw, 3.2rem); letter-spacing: 2px; color: var(--gold); line-height: 1; }
-  header p { font-size: 0.8rem; color: rgba(249,247,242,0.5); margin-top: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+  header { text-align:center; padding:24px 0 20px; border-bottom:2px solid var(--gold); margin-bottom:24px; }
+  .header-emoji { font-size:2.4rem; display:block; margin-bottom:4px; }
+  header h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.2rem,8vw,3.2rem); letter-spacing:2px; color:var(--gold); line-height:1; }
+  header p { font-size:0.8rem; color:rgba(249,247,242,0.5); margin-top:6px; letter-spacing:0.5px; text-transform:uppercase; }
 
-  /* Who are you */
-  .who-bar { display: flex; gap: 8px; margin-bottom: 20px; }
-  .who-btn { flex: 1; padding: 10px 6px; border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; background: transparent; color: rgba(249,247,242,0.5); font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-  .who-btn.mum.active { border-color: var(--mum); background: rgba(232,67,147,0.12); color: var(--mum); }
-  .who-btn.dad.active { border-color: var(--dad); background: rgba(59,130,246,0.12); color: var(--dad); }
-  .who-btn.jack.active { border-color: var(--jack); background: rgba(16,185,129,0.12); color: var(--jack); }
-  .who-btn.scorer.active { border-color: var(--gold); background: rgba(245,197,24,0.12); color: var(--gold); }
-  .who-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(249,247,242,0.4); margin-bottom: 8px; text-align: center; }
+  .who-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:rgba(249,247,242,0.4); margin-bottom:8px; text-align:center; }
+  .who-bar { display:flex; gap:8px; margin-bottom:20px; }
+  .who-btn { flex:1; padding:10px 6px; border:2px solid rgba(255,255,255,0.1); border-radius:10px; background:transparent; color:rgba(249,247,242,0.5); font-family:'Inter',sans-serif; font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+  .who-btn.mum.active  { border-color:var(--mum);  background:rgba(232,67,147,0.12); color:var(--mum); }
+  .who-btn.dad.active  { border-color:var(--dad);  background:rgba(59,130,246,0.12); color:var(--dad); }
+  .who-btn.jack.active { border-color:var(--jack); background:rgba(16,185,129,0.12); color:var(--jack); }
+  .who-btn.scorer.active { border-color:var(--gold); background:rgba(245,197,24,0.12); color:var(--gold); }
 
-  /* PIN modal */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .modal-overlay.hidden { display: none; }
-  .modal { background: var(--card); border: 2px solid var(--gold); border-radius: 16px; padding: 28px 24px; width: 100%; max-width: 320px; text-align: center; }
-  .modal h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--gold); letter-spacing: 1px; margin-bottom: 6px; }
-  .modal p { font-size: 0.82rem; color: rgba(249,247,242,0.5); margin-bottom: 20px; }
-  .pin-input { width: 100%; background: rgba(255,255,255,0.07); border: 1.5px solid var(--border); border-radius: 10px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 700; padding: 12px; text-align: center; letter-spacing: 8px; outline: none; margin-bottom: 12px; }
-  .pin-input:focus { border-color: var(--gold); }
-  .pin-btn { width: 100%; padding: 12px; background: var(--gold); border: none; border-radius: 10px; color: var(--dark); font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-bottom: 8px; }
-  .pin-cancel { background: none; border: none; color: rgba(249,247,242,0.4); font-family: 'Inter', sans-serif; font-size: 0.82rem; cursor: pointer; }
-  .pin-error { color: #ef4444; font-size: 0.8rem; margin-bottom: 8px; min-height: 18px; }
+  /* PIN */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.hidden { display:none; }
+  .modal { background:var(--card); border:2px solid var(--gold); border-radius:16px; padding:28px 24px; width:100%; max-width:320px; text-align:center; }
+  .modal h3 { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; color:var(--gold); letter-spacing:1px; margin-bottom:6px; }
+  .modal p { font-size:0.82rem; color:rgba(249,247,242,0.5); margin-bottom:20px; }
+  .pin-input { width:100%; background:rgba(255,255,255,0.07); border:1.5px solid var(--border); border-radius:10px; color:var(--white); font-family:'Inter',sans-serif; font-size:1.4rem; font-weight:700; padding:12px; text-align:center; letter-spacing:8px; outline:none; margin-bottom:12px; }
+  .pin-input:focus { border-color:var(--gold); }
+  .pin-btn { width:100%; padding:12px; background:var(--gold); border:none; border-radius:10px; color:var(--dark); font-family:'Inter',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; margin-bottom:8px; }
+  .pin-cancel { background:none; border:none; color:rgba(249,247,242,0.4); font-family:'Inter',sans-serif; font-size:0.82rem; cursor:pointer; }
+  .pin-error { color:#ef4444; font-size:0.8rem; margin-bottom:8px; min-height:18px; }
 
-  .tabs { display: flex; gap: 4px; background: var(--mid); border-radius: 12px; padding: 4px; margin-bottom: 20px; }
-  .tab { flex: 1; padding: 10px 6px; border: none; border-radius: 9px; background: transparent; color: rgba(249,247,242,0.5); font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
-  .tab.active { background: var(--gold); color: var(--dark); }
+  .tabs { display:flex; gap:4px; background:var(--mid); border-radius:12px; padding:4px; margin-bottom:20px; }
+  .tab { flex:1; padding:9px 4px; border:none; border-radius:9px; background:transparent; color:rgba(249,247,242,0.5); font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:600; letter-spacing:0.4px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+  .tab.active { background:var(--gold); color:var(--dark); }
 
-  .section { display: none; }
-  .section.active { display: block; }
+  .section { display:none; }
+  .section.active { display:block; }
 
-  .round-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .round-bar label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: rgba(249,247,242,0.6); letter-spacing: 1px; white-space: nowrap; }
-  .round-select { background: var(--mid); border: 1.5px solid var(--border); color: var(--white); font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; padding: 8px 12px; border-radius: 8px; flex: 1; cursor: pointer; outline: none; }
-  .round-select:focus { border-color: var(--gold); }
-  .round-meta { font-size: 0.73rem; color: rgba(249,247,242,0.4); margin-bottom: 14px; text-align: center; font-style: italic; }
+  .round-bar { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .round-bar label { font-size:0.8rem; font-weight:600; text-transform:uppercase; color:rgba(249,247,242,0.6); letter-spacing:1px; white-space:nowrap; }
+  .round-select { background:var(--mid); border:1.5px solid var(--border); color:var(--white); font-family:'Inter',sans-serif; font-size:0.95rem; font-weight:600; padding:8px 12px; border-radius:8px; flex:1; cursor:pointer; outline:none; }
+  .round-select:focus { border-color:var(--gold); }
+  .round-meta { font-size:0.73rem; color:rgba(249,247,242,0.4); margin-bottom:14px; text-align:center; font-style:italic; }
 
-  /* Loading */
-  .loading { text-align: center; padding: 40px 20px; color: rgba(249,247,242,0.4); font-size: 0.9rem; }
-  .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(245,197,24,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading { text-align:center; padding:40px 20px; color:rgba(249,247,242,0.4); font-size:0.9rem; }
+  .spinner { display:inline-block; width:24px; height:24px; border:3px solid rgba(245,197,24,0.2); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:12px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
 
-  .games-list { display: flex; flex-direction: column; gap: 10px; }
-  .game-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 14px 12px; position: relative; transition: border-color 0.2s; }
-  .game-number { font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(249,247,242,0.35); margin-bottom: 8px; }
+  /* Tips tab */
+  .games-list { display:flex; flex-direction:column; gap:10px; }
+  .game-card { background:var(--card); border:1.5px solid var(--border); border-radius:12px; padding:14px 14px 12px; }
+  .game-number { font-size:0.68rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(249,247,242,0.35); margin-bottom:8px; }
+  .teams-row { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:8px; margin-bottom:12px; }
+  .team-name { font-size:0.86rem; font-weight:700; text-align:center; padding:7px 6px; background:rgba(255,255,255,0.06); border-radius:7px; line-height:1.2; }
+  .vs { color:rgba(249,247,242,0.3); font-size:0.75rem; font-weight:700; letter-spacing:1px; }
+  .my-tip-row { margin-bottom:10px; }
+  .my-tip-row label { display:block; font-size:0.7rem; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; margin-bottom:6px; }
+  .tip-btns { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .tip-btn { padding:9px 6px; border:1.5px solid rgba(255,255,255,0.12); border-radius:8px; background:transparent; color:rgba(249,247,242,0.6); font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; transition:all 0.2s; text-align:center; }
+  .tip-btn.selected.mum  { border-color:var(--mum);  background:rgba(232,67,147,0.12); color:var(--mum); }
+  .tip-btn.selected.dad  { border-color:var(--dad);  background:rgba(59,130,246,0.12); color:var(--dad); }
+  .tip-btn.selected.jack { border-color:var(--jack); background:rgba(16,185,129,0.12); color:var(--jack); }
+  .all-tips { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+  .tipper-chip { font-size:0.72rem; font-weight:700; padding:3px 9px; border-radius:20px; }
+  .tipper-chip.mum  { background:rgba(232,67,147,0.12); color:var(--mum); }
+  .tipper-chip.dad  { background:rgba(59,130,246,0.12); color:var(--dad); }
+  .tipper-chip.jack { background:rgba(16,185,129,0.12); color:var(--jack); }
+  .tipper-chip.no-tip { background:rgba(255,255,255,0.05); color:rgba(249,247,242,0.3); }
+  .winner-row { display:flex; align-items:center; gap:8px; margin-top:6px; }
+  .winner-row label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(249,247,242,0.4); white-space:nowrap; }
+  .winner-select { background:rgba(255,255,255,0.05); border:1.5px solid rgba(255,255,255,0.1); color:var(--white); font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; padding:7px 10px; border-radius:7px; cursor:pointer; outline:none; flex:1; -webkit-appearance:none; appearance:none; }
+  .winner-select.has-winner { border-color:var(--gold); background:rgba(245,197,24,0.08); }
+  .result-ticks { display:flex; gap:5px; margin-top:8px; flex-wrap:wrap; }
+  .tick { font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:20px; }
+  .tick.correct { background:rgba(16,185,129,0.2); color:var(--correct); }
+  .tick.wrong   { background:rgba(239,68,68,0.15); color:var(--wrong); }
+  .saving-indicator { text-align:center; font-size:0.78rem; color:var(--jack); margin-top:6px; min-height:18px; font-weight:600; }
+  .bye-notice { background:rgba(255,255,255,0.04); border:1px dashed rgba(255,255,255,0.12); border-radius:10px; padding:10px 14px; margin-top:8px; }
+  .bye-notice p { font-size:0.78rem; color:rgba(249,247,242,0.4); font-style:italic; }
 
-  .teams-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin-bottom: 12px; }
-  .team-name { font-size: 0.86rem; font-weight: 700; text-align: center; padding: 7px 6px; background: rgba(255,255,255,0.06); border-radius: 7px; line-height: 1.2; }
-  .vs { color: rgba(249,247,242,0.3); font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; }
+  /* ── MATHS WORKSHEET ─────────────────────────────────────── */
+  .maths-intro { background:var(--card); border:1.5px solid var(--gold); border-radius:12px; padding:16px; margin-bottom:20px; text-align:center; }
+  .maths-intro h2 { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; color:var(--gold); letter-spacing:1px; margin-bottom:4px; }
+  .maths-intro p  { font-size:0.82rem; color:rgba(249,247,242,0.55); line-height:1.5; }
 
-  /* Single tipper tip row */
-  .my-tip-row { margin-bottom: 10px; }
-  .my-tip-row label { display: block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px; }
-  .tip-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-  .tip-btn { padding: 9px 6px; border: 1.5px solid rgba(255,255,255,0.12); border-radius: 8px; background: transparent; color: rgba(249,247,242,0.6); font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
-  .tip-btn.selected.mum { border-color: var(--mum); background: rgba(232,67,147,0.12); color: var(--mum); }
-  .tip-btn.selected.dad { border-color: var(--dad); background: rgba(59,130,246,0.12); color: var(--dad); }
-  .tip-btn.selected.jack { border-color: var(--jack); background: rgba(16,185,129,0.12); color: var(--jack); }
+  .maths-round-bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
 
-  /* All tips summary (visible to all) */
-  .all-tips { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-  .tipper-chip { font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
-  .tipper-chip.mum { background: rgba(232,67,147,0.12); color: var(--mum); }
-  .tipper-chip.dad { background: rgba(59,130,246,0.12); color: var(--dad); }
-  .tipper-chip.jack { background: rgba(16,185,129,0.12); color: var(--jack); }
-  .tipper-chip.no-tip { background: rgba(255,255,255,0.05); color: rgba(249,247,242,0.3); }
+  /* Per-game maths row */
+  .maths-game { background:var(--card); border:1.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:10px; }
+  .maths-game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px; }
+  .maths-game-title { font-size:0.85rem; font-weight:700; }
+  .maths-result-badge { font-size:0.75rem; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(245,197,24,0.12); color:var(--gold); }
+  .maths-result-badge.none { background:rgba(255,255,255,0.06); color:rgba(249,247,242,0.35); }
 
-  /* Scorer winner row */
-  .winner-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-  .winner-row label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(249,247,242,0.4); white-space: nowrap; }
-  .winner-select { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); color: var(--white); font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600; padding: 7px 10px; border-radius: 7px; cursor: pointer; outline: none; flex: 1; -webkit-appearance: none; appearance: none; }
-  .winner-select.has-winner { border-color: var(--gold); background: rgba(245,197,24,0.08); }
+  .maths-players { display:flex; flex-direction:column; gap:8px; }
+  .maths-player-row { display:grid; grid-template-columns:70px 1fr auto auto; align-items:center; gap:8px; }
+  .maths-player-name { font-size:0.8rem; font-weight:700; }
+  .maths-player-name.mum  { color:var(--mum); }
+  .maths-player-name.dad  { color:var(--dad); }
+  .maths-player-name.jack { color:var(--jack); }
+  .maths-tip-label { font-size:0.75rem; color:rgba(249,247,242,0.5); }
+  .maths-pts-input { width:52px; background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.15); border-radius:8px; color:var(--white); font-family:'Inter',sans-serif; font-size:1rem; font-weight:700; padding:6px 8px; text-align:center; outline:none; transition:border-color 0.2s; -webkit-appearance:none; appearance:none; }
+  .maths-pts-input:focus { border-color:var(--gold); }
+  .maths-pts-input.correct { border-color:var(--correct); background:rgba(16,185,129,0.1); color:var(--correct); }
+  .maths-pts-input.wrong   { border-color:var(--wrong);   background:rgba(239,68,68,0.08);  color:var(--wrong); }
+  .maths-check-icon { font-size:1rem; min-width:20px; text-align:center; }
 
-  /* Result ticks */
-  .result-ticks { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-  .tick { font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
-  .tick.correct { background: rgba(16,185,129,0.2); color: #10b981; }
-  .tick.wrong { background: rgba(239,68,68,0.15); color: #ef4444; }
+  /* Weekly totals */
+  .maths-totals-section { background:var(--card); border:1.5px solid var(--border); border-radius:12px; padding:16px; margin-top:16px; }
+  .maths-totals-section h3 { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; color:var(--gold); letter-spacing:1px; margin-bottom:14px; }
+  .maths-totals-grid { display:flex; flex-direction:column; gap:10px; }
+  .maths-total-row { display:grid; grid-template-columns:80px 1fr auto auto; align-items:center; gap:10px; }
+  .maths-total-label { font-size:0.85rem; font-weight:700; }
+  .maths-total-label.mum  { color:var(--mum); }
+  .maths-total-label.dad  { color:var(--dad); }
+  .maths-total-label.jack { color:var(--jack); }
+  .maths-hint { font-size:0.72rem; color:rgba(249,247,242,0.3); font-style:italic; }
+  .maths-total-input { width:60px; background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.15); border-radius:8px; color:var(--white); font-family:'Inter',sans-serif; font-size:1.1rem; font-weight:700; padding:7px 8px; text-align:center; outline:none; -webkit-appearance:none; appearance:none; }
+  .maths-total-input.correct { border-color:var(--correct); background:rgba(16,185,129,0.1); color:var(--correct); }
+  .maths-total-input.wrong   { border-color:var(--wrong);   background:rgba(239,68,68,0.08);  color:var(--wrong); }
 
-  .saving-indicator { text-align: center; font-size: 0.78rem; color: var(--jack); margin-top: 6px; min-height: 18px; font-weight: 600; }
+  /* Running tally */
+  .maths-tally-section { background:var(--card); border:1.5px solid var(--border); border-radius:12px; padding:16px; margin-top:16px; }
+  .maths-tally-section h3 { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; color:var(--gold); letter-spacing:1px; margin-bottom:4px; }
+  .maths-tally-section p { font-size:0.75rem; color:rgba(249,247,242,0.4); margin-bottom:14px; }
+  .maths-tally-grid { display:flex; flex-direction:column; gap:10px; }
+  .maths-tally-row { display:grid; grid-template-columns:80px 1fr auto auto; align-items:center; gap:10px; }
 
-  .bye-notice { background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 14px; margin-top: 8px; }
-  .bye-notice p { font-size: 0.78rem; color: rgba(249,247,242,0.4); font-style: italic; }
+  .check-all-btn { width:100%; margin-top:16px; padding:13px; background:var(--gold); border:none; border-radius:12px; color:var(--dark); font-family:'Inter',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:background 0.2s; }
+  .check-all-btn:hover { background:var(--gold-dark); }
+  .maths-score-banner { text-align:center; margin-top:12px; font-size:1rem; font-weight:700; min-height:24px; }
 
   /* Ladder */
-  .ladder-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .ladder-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 1px; color: var(--gold); }
-  .ladder-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
-  .ladder-table th { font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(249,247,242,0.4); padding: 4px 10px; text-align: left; }
-  .ladder-table th:nth-child(n+2) { text-align: center; }
-  .ladder-row td { background: var(--card); padding: 14px 10px; font-weight: 600; }
-  .ladder-row td:first-child { border-radius: 10px 0 0 10px; padding-left: 14px; }
-  .ladder-row td:last-child { border-radius: 0 10px 10px 0; padding-right: 14px; text-align: center; }
-  .ladder-row td:nth-child(n+2) { text-align: center; }
-  .rank-badge { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; font-size: 0.8rem; font-weight: 800; margin-right: 8px; }
-  .rank-1 { background: var(--gold); color: var(--dark); }
-  .rank-2 { background: rgba(249,247,242,0.15); color: var(--white); }
-  .rank-3 { background: rgba(249,247,242,0.08); color: rgba(249,247,242,0.6); }
-  .player-name { font-size: 0.95rem; font-weight: 700; }
-  .player-name.mum { color: var(--mum); }
-  .player-name.dad { color: var(--dad); }
-  .player-name.jack { color: var(--jack); }
-  .pts-total { font-size: 1.1rem; font-weight: 800; color: var(--gold); }
-  .pts-cell { font-size: 0.85rem; color: rgba(249,247,242,0.6); }
-
-  .round-breakdown { margin-top: 24px; }
-  .round-breakdown h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 1px; color: rgba(249,247,242,0.7); margin-bottom: 12px; }
-  .breakdown-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
-  .breakdown-round { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-  .breakdown-round span:first-child { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(249,247,242,0.5); }
-  .scorer-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-  .chip { font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
-  .chip.mum { background: rgba(232,67,147,0.15); color: var(--mum); }
-  .chip.dad { background: rgba(59,130,246,0.15); color: var(--dad); }
-  .chip.jack { background: rgba(16,185,129,0.15); color: var(--jack); }
-
-  .empty-state { text-align: center; padding: 40px 20px; color: rgba(249,247,242,0.3); }
-  .empty-state .big-emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
-
-  @media (max-width: 380px) {
-    .tip-btn { font-size: 0.72rem; padding: 7px 4px; }
-    .team-name { font-size: 0.78px; }
-  }
+  .ladder-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .ladder-header h2 { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:1px; color:var(--gold); }
+  .ladder-table { width:100%; border-collapse:separate; border-spacing:0 6px; }
+  .ladder-table th { font-size:0.68rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(249,247,242,0.4); padding:4px 10px; text-align:left; }
+  .ladder-table th:nth-child(n+2) { text-align:center; }
+  .ladder-row td { background:var(--card); padding:14px 10px; font-weight:600; }
+  .ladder-row td:first-child { border-radius:10px 0 0 10px; padding-left:14px; }
+  .ladder-row td:last-child  { border-radius:0 10px 10px 0; padding-right:14px; text-align:center; }
+  .ladder-row td:nth-child(n+2) { text-align:center; }
+  .rank-badge { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; font-size:0.8rem; font-weight:800; margin-right:8px; }
+  .rank-1 { background:var(--gold); color:var(--dark); }
+  .rank-2 { background:rgba(249,247,242,0.15); color:var(--white); }
+  .rank-3 { background:rgba(249,247,242,0.08); color:rgba(249,247,242,0.6); }
+  .player-name { font-size:0.95rem; font-weight:700; }
+  .player-name.mum  { color:var(--mum); }
+  .player-name.dad  { color:var(--dad); }
+  .player-name.jack { color:var(--jack); }
+  .pts-total { font-size:1.1rem; font-weight:800; color:var(--gold); }
+  .pts-cell  { font-size:0.85rem; color:rgba(249,247,242,0.6); }
+  .round-breakdown { margin-top:24px; }
+  .round-breakdown h3 { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:1px; color:rgba(249,247,242,0.7); margin-bottom:12px; }
+  .breakdown-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:8px; }
+  .breakdown-round { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+  .breakdown-round span:first-child { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:rgba(249,247,242,0.5); }
+  .scorer-chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .chip { font-size:0.78rem; font-weight:700; padding:3px 10px; border-radius:20px; }
+  .chip.mum  { background:rgba(232,67,147,0.15); color:var(--mum); }
+  .chip.dad  { background:rgba(59,130,246,0.15); color:var(--dad); }
+  .chip.jack { background:rgba(16,185,129,0.15); color:var(--jack); }
+  .empty-state { text-align:center; padding:40px 20px; color:rgba(249,247,242,0.3); }
+  .empty-state .big-emoji { font-size:3rem; display:block; margin-bottom:12px; }
 </style>
 </head>
 <body>
@@ -158,19 +186,17 @@
     <p>2026 AFL Season</p>
   </header>
 
-  <!-- Who are you? -->
   <div class="who-label">Who are you?</div>
   <div class="who-bar">
-    <button class="who-btn mum" onclick="setPlayer('mum')">Mum</button>
-    <button class="who-btn dad" onclick="setPlayer('dad')">Dad</button>
-    <button class="who-btn jack" onclick="setPlayer('jack')">Jack</button>
+    <button class="who-btn mum"    onclick="setPlayer('mum')">Mum</button>
+    <button class="who-btn dad"    onclick="setPlayer('dad')">Dad</button>
+    <button class="who-btn jack"   onclick="setPlayer('jack')">Jack</button>
     <button class="who-btn scorer" onclick="promptScorer()">📋 Scores</button>
   </div>
 
-  <!-- PIN modal -->
   <div class="modal-overlay hidden" id="pinModal">
     <div class="modal">
-      <h3>🔐 Enter PIN</h3>
+      <h3>🔐 Scorer PIN</h3>
       <p>Only the scorer can enter results</p>
       <input class="pin-input" type="password" inputmode="numeric" maxlength="4" id="pinInput" placeholder="••••">
       <div class="pin-error" id="pinError"></div>
@@ -180,20 +206,36 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" id="tab-tips" onclick="showTab('tips', event)">Tips</button>
-    <button class="tab" id="tab-ladder" onclick="showTab('ladder', event)">Ladder 🏆</button>
+    <button class="tab active" id="tab-tips"   onclick="showTab('tips',event)">Tips</button>
+    <button class="tab"        id="tab-maths"  onclick="showTab('maths',event)">🧮 Maths</button>
+    <button class="tab"        id="tab-ladder" onclick="showTab('ladder',event)">Ladder 🏆</button>
   </div>
 
+  <!-- TIPS -->
   <div id="section-tips" class="section active">
     <div class="round-bar">
       <label>Round</label>
-      <select class="round-select" id="roundSelect" onchange="loadRound()"></select>
+      <select class="round-select" id="tipsRoundSelect" onchange="loadTipsRound()"></select>
     </div>
-    <div class="round-meta" id="roundMeta"></div>
-    <div id="savingIndicator" class="saving-indicator"></div>
+    <div class="round-meta" id="tipsRoundMeta"></div>
+    <div class="saving-indicator" id="savingIndicator"></div>
     <div class="games-list" id="gamesList"></div>
   </div>
 
+  <!-- MATHS WORKSHEET -->
+  <div id="section-maths" class="section">
+    <div class="maths-intro">
+      <h2>🧮 Maths Time!</h2>
+      <p>Look at each game — who tipped the winner?<br>Give them <strong>2 points</strong> for correct, <strong>0</strong> for wrong.<br>Then add up each person's total for the round!</p>
+    </div>
+    <div class="maths-round-bar round-bar">
+      <label>Round</label>
+      <select class="round-select" id="mathsRoundSelect" onchange="loadMathsRound()"></select>
+    </div>
+    <div id="mathsContent"></div>
+  </div>
+
+  <!-- LADDER -->
   <div id="section-ladder" class="section">
     <div class="ladder-header"><h2>Ladder</h2></div>
     <div id="ladderContent"></div>
@@ -201,15 +243,13 @@
 </div>
 
 <script>
-// ── Config ────────────────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://cmjjfwdvzueinyqqybwc.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_ZtNx-RHCzi9PZCbx0v6GWQ_bV7Sd854';
-const SCORER_PIN  = '1234'; // change this to whatever you want
+const SCORER_PIN   = '1234';
 
 const PLAYERS = ['mum','dad','jack'];
 const LABELS  = { mum:'Mum', dad:'Dad', jack:'Jack' };
 
-// ── Fixture ───────────────────────────────────────────────────────────────
 const FIXTURE = {
   "Round 11": { dates:"21–24 May", games:[["Hawthorn","Adelaide Crows"],["Richmond","Essendon"],["Fremantle","St Kilda"],["North Melbourne","Gold Coast Suns"],["Geelong Cats","Sydney Swans"],["Collingwood","West Coast Eagles"],["Port Adelaide","Carlton"],["GWS Giants","Brisbane Lions"],["Western Bulldogs","Melbourne"]], byes:[] },
   "Round 12": { dates:"28–31 May", games:[["St Kilda","Hawthorn"],["Carlton","Geelong Cats"],["Sydney Swans","Richmond"],["Brisbane Lions","Fremantle"],["Western Bulldogs","Collingwood"],["Melbourne","GWS Giants"],["West Coast Eagles","Essendon"]], byes:["Adelaide Crows","Gold Coast Suns","North Melbourne","Port Adelaide"] },
@@ -228,28 +268,20 @@ const FIXTURE = {
 };
 const ROUND_KEYS = Object.keys(FIXTURE);
 
-// ── State ─────────────────────────────────────────────────────────────────
 let currentPlayer = localStorage.getItem('footyPlayer') || null;
 let isScorer = false;
-let currentRoundKey = ROUND_KEYS[0];
-let dbData = {}; // { round: { gameIdx: { mum, dad, jack, winner } } }
+let currentTipsRound  = ROUND_KEYS[0];
+let currentMathsRound = ROUND_KEYS[0];
+let dbData = {};
 let saveTimer = null;
 
-// ── Supabase helpers ──────────────────────────────────────────────────────
+// ── Supabase ──────────────────────────────────────────────────────────────
 async function dbFetch(path, opts={}) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal',
-      ...opts.headers
-    },
+    headers: { 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}`, 'Content-Type':'application/json', 'Prefer':'return=minimal', ...opts.headers },
     ...opts
   });
-  if (opts.method === 'GET' || !opts.method) {
-    return res.ok ? res.json() : [];
-  }
+  if (!opts.method || opts.method==='GET') return res.ok ? res.json() : [];
   return res.ok;
 }
 
@@ -259,252 +291,43 @@ async function loadAllTips() {
   (rows||[]).forEach(r => {
     if (!dbData[r.round]) dbData[r.round] = {};
     if (!dbData[r.round][r.game_index]) dbData[r.round][r.game_index] = {};
-    if (r.player === 'winner') {
-      dbData[r.round][r.game_index].winner = r.winner;
-    } else {
-      dbData[r.round][r.game_index][r.player] = r.tip;
-    }
+    if (r.player==='winner') dbData[r.round][r.game_index].winner = r.winner;
+    else dbData[r.round][r.game_index][r.player] = r.tip;
   });
 }
 
 async function saveTip(round, gameIndex, player, tip) {
-  await dbFetch('tips', {
-    method: 'POST',
-    headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-    body: JSON.stringify({ round, game_index: gameIndex, player, tip, winner: null, updated_at: new Date().toISOString() })
-  });
+  await dbFetch('tips', { method:'POST', headers:{'Prefer':'resolution=merge-duplicates,return=minimal'}, body:JSON.stringify({ round, game_index:gameIndex, player, tip, winner:null, updated_at:new Date().toISOString() }) });
 }
-
 async function saveWinner(round, gameIndex, winner) {
-  await dbFetch('tips', {
-    method: 'POST',
-    headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-    body: JSON.stringify({ round, game_index: gameIndex, player: 'winner', tip: null, winner, updated_at: new Date().toISOString() })
-  });
+  await dbFetch('tips', { method:'POST', headers:{'Prefer':'resolution=merge-duplicates,return=minimal'}, body:JSON.stringify({ round, game_index:gameIndex, player:'winner', tip:null, winner, updated_at:new Date().toISOString() }) });
 }
 
-// ── Player selection ──────────────────────────────────────────────────────
+// ── Player ────────────────────────────────────────────────────────────────
 function setPlayer(p) {
-  currentPlayer = p;
-  isScorer = false;
+  currentPlayer = p; isScorer = false;
   localStorage.setItem('footyPlayer', p);
   document.querySelectorAll('.who-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`.who-btn.${p}`).classList.add('active');
-  renderCurrentRound();
+  renderTipsRound();
 }
-
 function promptScorer() {
   document.getElementById('pinModal').classList.remove('hidden');
   document.getElementById('pinInput').value = '';
   document.getElementById('pinError').textContent = '';
   setTimeout(() => document.getElementById('pinInput').focus(), 100);
 }
-
 function checkPin() {
-  const val = document.getElementById('pinInput').value;
-  if (val === SCORER_PIN) {
-    isScorer = true;
-    currentPlayer = null;
+  if (document.getElementById('pinInput').value === SCORER_PIN) {
+    isScorer = true; currentPlayer = null;
     localStorage.removeItem('footyPlayer');
     document.querySelectorAll('.who-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('.who-btn.scorer').classList.add('active');
-    closePin();
-    renderCurrentRound();
-  } else {
-    document.getElementById('pinError').textContent = 'Wrong PIN, try again';
-  }
+    closePin(); renderTipsRound();
+  } else { document.getElementById('pinError').textContent = 'Wrong PIN, try again'; }
 }
-
-function closePin() {
-  document.getElementById('pinModal').classList.add('hidden');
-}
-
-// allow enter key on PIN
+function closePin() { document.getElementById('pinModal').classList.add('hidden'); }
 document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key==='Enter') checkPin(); });
-
-// ── Round loading ─────────────────────────────────────────────────────────
-function loadRound() {
-  currentRoundKey = document.getElementById('roundSelect').value;
-  renderCurrentRound();
-}
-
-function renderCurrentRound() {
-  const rdata = FIXTURE[currentRoundKey];
-  document.getElementById('roundMeta').textContent = rdata.dates;
-  const list = document.getElementById('gamesList');
-  list.innerHTML = '<div class="loading"><div class="spinner"></div><br>Loading tips…</div>';
-
-  loadAllTips().then(() => {
-    list.innerHTML = '';
-    rdata.games.forEach((pair, i) => list.appendChild(makeCard(pair, i)));
-    if (rdata.byes.length) {
-      const b = document.createElement('div');
-      b.className = 'bye-notice';
-      b.innerHTML = `<p>🛌 Byes: ${rdata.byes.join(', ')}</p>`;
-      list.appendChild(b);
-    }
-  });
-}
-
-// ── Card rendering ────────────────────────────────────────────────────────
-function makeCard(pair, idx) {
-  const [home, away] = pair;
-  const saved = (dbData[currentRoundKey] || {})[idx] || {};
-  const winner = saved.winner || '';
-
-  const card = document.createElement('div');
-  card.className = 'game-card';
-  card.dataset.idx = idx;
-
-  // Game header
-  card.innerHTML = `
-    <div class="game-number">Game ${idx+1}</div>
-    <div class="teams-row">
-      <div class="team-name">${home}</div>
-      <span class="vs">VS</span>
-      <div class="team-name">${away}</div>
-    </div>
-  `;
-
-  // Tips section — show MY tip buttons if a player is selected
-  if (currentPlayer) {
-    const myTip = saved[currentPlayer] || '';
-    const tipDiv = document.createElement('div');
-    tipDiv.className = 'my-tip-row';
-    tipDiv.innerHTML = `
-      <label style="color:var(--${currentPlayer})">Your tip</label>
-      <div class="tip-btns">
-        <button class="tip-btn ${myTip==='home'?'selected '+currentPlayer:''}" onclick="pickTip(${idx},'home',this)">${home}</button>
-        <button class="tip-btn ${myTip==='away'?'selected '+currentPlayer:''}" onclick="pickTip(${idx},'away',this)">${away}</button>
-      </div>
-    `;
-    card.appendChild(tipDiv);
-  }
-
-  // All tips summary chips (visible to everyone)
-  const chipsDiv = document.createElement('div');
-  chipsDiv.className = 'all-tips';
-  chipsDiv.id = `chips-${idx}`;
-  PLAYERS.forEach(p => {
-    const t = saved[p];
-    const span = document.createElement('span');
-    span.className = `tipper-chip ${t ? p : 'no-tip'}`;
-    span.textContent = t ? `${LABELS[p]}: ${t==='home'?home:away}` : `${LABELS[p]}: —`;
-    chipsDiv.appendChild(span);
-  });
-  card.appendChild(chipsDiv);
-
-  // Winner row — only for scorer
-  if (isScorer) {
-    const wDiv = document.createElement('div');
-    wDiv.className = 'winner-row';
-    wDiv.innerHTML = `
-      <label>Winner</label>
-      <select class="winner-select ${winner?'has-winner':''}" onchange="pickWinner(${idx},this)">
-        <option value="">Not played yet</option>
-        <option value="home" ${winner==='home'?'selected':''}>${home}</option>
-        <option value="away" ${winner==='away'?'selected':''}>${away}</option>
-      </select>
-    `;
-    card.appendChild(wDiv);
-  }
-
-  // Result ticks if there's a winner
-  if (winner) {
-    const tickDiv = document.createElement('div');
-    tickDiv.className = 'result-ticks';
-    tickDiv.id = `ticks-${idx}`;
-    PLAYERS.forEach(p => {
-      if (!saved[p]) return;
-      const correct = saved[p] === winner;
-      const teamName = saved[p]==='home' ? home : away;
-      const span = document.createElement('span');
-      span.className = `tick ${correct?'correct':'wrong'}`;
-      span.textContent = `${LABELS[p]}: ${correct?'✓':'✗'} ${teamName}`;
-      tickDiv.appendChild(span);
-    });
-    card.appendChild(tickDiv);
-  }
-
-  return card;
-}
-
-// ── Interactions ──────────────────────────────────────────────────────────
-async function pickTip(idx, tip, btn) {
-  if (!currentPlayer) return;
-
-  // Update UI immediately
-  const card = btn.closest('.game-card');
-  card.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected', 'mum','dad','jack'));
-  btn.classList.add('selected', currentPlayer);
-
-  // Update chips
-  const pair = FIXTURE[currentRoundKey].games[idx];
-  const chips = document.getElementById(`chips-${idx}`);
-  if (chips) {
-    const chip = chips.querySelector(`.tipper-chip.${currentPlayer}`) || chips.querySelector('.tipper-chip.no-tip');
-    // find the right chip
-    Array.from(chips.children).forEach(c => {
-      if (c.classList.contains(currentPlayer) || (c.classList.contains('no-tip') && c.textContent.startsWith(LABELS[currentPlayer]))) {
-        c.className = `tipper-chip ${currentPlayer}`;
-        c.textContent = `${LABELS[currentPlayer]}: ${tip==='home'?pair[0]:pair[1]}`;
-      }
-    });
-  }
-
-  // Cache locally
-  if (!dbData[currentRoundKey]) dbData[currentRoundKey] = {};
-  if (!dbData[currentRoundKey][idx]) dbData[currentRoundKey][idx] = {};
-  dbData[currentRoundKey][idx][currentPlayer] = tip;
-
-  // Save to DB (debounced)
-  showSaving('Saving…');
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
-    await saveTip(currentRoundKey, idx, currentPlayer, tip);
-    showSaving('✓ Saved!');
-    setTimeout(() => showSaving(''), 2000);
-  }, 600);
-}
-
-async function pickWinner(idx, sel) {
-  const winner = sel.value;
-  sel.classList.toggle('has-winner', !!winner);
-
-  if (!dbData[currentRoundKey]) dbData[currentRoundKey] = {};
-  if (!dbData[currentRoundKey][idx]) dbData[currentRoundKey][idx] = {};
-  dbData[currentRoundKey][idx].winner = winner;
-
-  showSaving('Saving…');
-  await saveWinner(currentRoundKey, idx, winner);
-  showSaving('✓ Saved!');
-  setTimeout(() => showSaving(''), 2000);
-
-  // Refresh ticks
-  const card = sel.closest('.game-card');
-  let tickDiv = card.querySelector('.result-ticks');
-  if (tickDiv) tickDiv.remove();
-  if (winner) {
-    const pair = FIXTURE[currentRoundKey].games[idx];
-    const saved = dbData[currentRoundKey][idx];
-    tickDiv = document.createElement('div');
-    tickDiv.className = 'result-ticks';
-    PLAYERS.forEach(p => {
-      if (!saved[p]) return;
-      const correct = saved[p] === winner;
-      const teamName = saved[p]==='home' ? pair[0] : pair[1];
-      const span = document.createElement('span');
-      span.className = `tick ${correct?'correct':'wrong'}`;
-      span.textContent = `${LABELS[p]}: ${correct?'✓':'✗'} ${teamName}`;
-      tickDiv.appendChild(span);
-    });
-    card.appendChild(tickDiv);
-  }
-}
-
-function showSaving(msg) {
-  document.getElementById('savingIndicator').textContent = msg;
-}
 
 // ── Tabs ──────────────────────────────────────────────────────────────────
 function showTab(tab, e) {
@@ -512,90 +335,267 @@ function showTab(tab, e) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   e.currentTarget.classList.add('active');
   document.getElementById('section-'+tab).classList.add('active');
-  if (tab === 'ladder') renderLadder();
+  if (tab==='ladder') renderLadder();
+  if (tab==='maths')  loadMathsRound();
 }
 
-// ── Ladder ────────────────────────────────────────────────────────────────
-async function renderLadder() {
-  const content = document.getElementById('ladderContent');
-  content.innerHTML = '<div class="loading"><div class="spinner"></div><br>Loading ladder…</div>';
+// ── TIPS TAB ──────────────────────────────────────────────────────────────
+function loadTipsRound() {
+  currentTipsRound = document.getElementById('tipsRoundSelect').value;
+  renderTipsRound();
+}
+function renderTipsRound() {
+  const rdata = FIXTURE[currentTipsRound];
+  document.getElementById('tipsRoundMeta').textContent = rdata.dates;
+  const list = document.getElementById('gamesList');
+  list.innerHTML = '<div class="loading"><div class="spinner"></div><br>Loading…</div>';
+  loadAllTips().then(() => {
+    list.innerHTML = '';
+    rdata.games.forEach((pair,i) => list.appendChild(makeTipsCard(pair,i)));
+    if (rdata.byes.length) {
+      const b = document.createElement('div'); b.className='bye-notice';
+      b.innerHTML=`<p>🛌 Byes: ${rdata.byes.join(', ')}</p>`; list.appendChild(b);
+    }
+  });
+}
+function makeTipsCard(pair, idx) {
+  const [home,away] = pair;
+  const saved = (dbData[currentTipsRound]||{})[idx]||{};
+  const winner = saved.winner||'';
+  const card = document.createElement('div'); card.className='game-card'; card.dataset.idx=idx;
+  card.innerHTML=`<div class="game-number">Game ${idx+1}</div><div class="teams-row"><div class="team-name">${home}</div><span class="vs">VS</span><div class="team-name">${away}</div></div>`;
+  if (currentPlayer) {
+    const myTip = saved[currentPlayer]||'';
+    const d=document.createElement('div'); d.className='my-tip-row';
+    d.innerHTML=`<label style="color:var(--${currentPlayer})">Your tip</label><div class="tip-btns"><button class="tip-btn ${myTip==='home'?'selected '+currentPlayer:''}" onclick="pickTip(${idx},'home',this)">${home}</button><button class="tip-btn ${myTip==='away'?'selected '+currentPlayer:''}" onclick="pickTip(${idx},'away',this)">${away}</button></div>`;
+    card.appendChild(d);
+  }
+  const chips=document.createElement('div'); chips.className='all-tips'; chips.id=`chips-${idx}`;
+  PLAYERS.forEach(p => { const t=saved[p]; const s=document.createElement('span'); s.className=`tipper-chip ${t?p:'no-tip'}`; s.textContent=t?`${LABELS[p]}: ${t==='home'?home:away}`:`${LABELS[p]}: —`; chips.appendChild(s); });
+  card.appendChild(chips);
+  if (isScorer) {
+    const wd=document.createElement('div'); wd.className='winner-row';
+    wd.innerHTML=`<label>Winner</label><select class="winner-select ${winner?'has-winner':''}" onchange="pickWinner(${idx},this)"><option value="">Not played yet</option><option value="home" ${winner==='home'?'selected':''}>${home}</option><option value="away" ${winner==='away'?'selected':''}>${away}</option></select>`;
+    card.appendChild(wd);
+  }
+  if (winner) {
+    const td=document.createElement('div'); td.className='result-ticks';
+    PLAYERS.forEach(p => { if (!saved[p]) return; const ok=saved[p]===winner; const s=document.createElement('span'); s.className=`tick ${ok?'correct':'wrong'}`; s.textContent=`${LABELS[p]}: ${ok?'✓':'✗'} ${saved[p]==='home'?home:away}`; td.appendChild(s); });
+    card.appendChild(td);
+  }
+  return card;
+}
+async function pickTip(idx, tip, btn) {
+  if (!currentPlayer) return;
+  const card = btn.closest('.game-card');
+  card.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected','mum','dad','jack'));
+  btn.classList.add('selected', currentPlayer);
+  const pair = FIXTURE[currentTipsRound].games[idx];
+  const chips = document.getElementById(`chips-${idx}`);
+  if (chips) Array.from(chips.children).forEach(c => { if (c.textContent.startsWith(LABELS[currentPlayer])) { c.className=`tipper-chip ${currentPlayer}`; c.textContent=`${LABELS[currentPlayer]}: ${tip==='home'?pair[0]:pair[1]}`; } });
+  if (!dbData[currentTipsRound]) dbData[currentTipsRound]={};
+  if (!dbData[currentTipsRound][idx]) dbData[currentTipsRound][idx]={};
+  dbData[currentTipsRound][idx][currentPlayer]=tip;
+  showSaving('Saving…'); clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{ await saveTip(currentTipsRound,idx,currentPlayer,tip); showSaving('✓ Saved!'); setTimeout(()=>showSaving(''),2000); },600);
+}
+async function pickWinner(idx, sel) {
+  const winner=sel.value; sel.classList.toggle('has-winner',!!winner);
+  if (!dbData[currentTipsRound]) dbData[currentTipsRound]={};
+  if (!dbData[currentTipsRound][idx]) dbData[currentTipsRound][idx]={};
+  dbData[currentTipsRound][idx].winner=winner;
+  showSaving('Saving…'); await saveWinner(currentTipsRound,idx,winner); showSaving('✓ Saved!'); setTimeout(()=>showSaving(''),2000);
+  const card=sel.closest('.game-card'); let td=card.querySelector('.result-ticks'); if(td)td.remove();
+  if (winner) { const pair=FIXTURE[currentTipsRound].games[idx]; const saved=dbData[currentTipsRound][idx]; td=document.createElement('div'); td.className='result-ticks'; PLAYERS.forEach(p=>{if(!saved[p])return;const ok=saved[p]===winner;const s=document.createElement('span');s.className=`tick ${ok?'correct':'wrong'}`;s.textContent=`${LABELS[p]}: ${ok?'✓':'✗'} ${saved[p]==='home'?pair[0]:pair[1]}`;td.appendChild(s);}); card.appendChild(td); }
+}
+function showSaving(msg) { document.getElementById('savingIndicator').textContent=msg; }
+
+// ── MATHS WORKSHEET ───────────────────────────────────────────────────────
+function loadMathsRound() {
+  currentMathsRound = document.getElementById('mathsRoundSelect').value;
+  renderMathsWorksheet();
+}
+
+async function renderMathsWorksheet() {
+  const content = document.getElementById('mathsContent');
+  content.innerHTML = '<div class="loading"><div class="spinner"></div><br>Loading…</div>';
   await loadAllTips();
 
-  const totals = { mum:0, dad:0, jack:0 };
-  const byRound = {};
+  const rdata = FIXTURE[currentMathsRound];
+  const hasAnyWinner = rdata.games.some((_,i) => (dbData[currentMathsRound]||{})[i]?.winner);
 
-  ROUND_KEYS.forEach(rk => {
-    const rnd = { mum:0, dad:0, jack:0 };
-    const games = FIXTURE[rk].games;
-    games.forEach((_, i) => {
-      const g = (dbData[rk]||{})[i] || {};
-      if (!g.winner) return;
-      PLAYERS.forEach(p => { if (g[p]===g.winner) { rnd[p]+=2; totals[p]+=2; } });
-    });
-    byRound[rk] = rnd;
-  });
-
-  const hasData = ROUND_KEYS.some(rk => FIXTURE[rk].games.some((_,i)=>(dbData[rk]||{})[i]?.winner));
-  if (!hasData) {
-    content.innerHTML = `<div class="empty-state"><span class="big-emoji">🏉</span><p>No results entered yet — check back after games are played!</p></div>`;
+  if (!hasAnyWinner) {
+    content.innerHTML = `<div class="empty-state"><span class="big-emoji">⏳</span><p>No results entered yet for this round.<br>Check back once the games have been played!</p></div>`;
     return;
   }
 
-  const sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  const playedRounds = ROUND_KEYS.filter(rk => FIXTURE[rk].games.some((_,i)=>(dbData[rk]||{})[i]?.winner));
+  let html = '';
 
-  let html = `<table class="ladder-table"><thead><tr>
-    <th>Tipper</th><th>Total</th>
-    ${playedRounds.map(rk=>`<th style="font-size:0.62rem">${rk.replace('Round ','R')}</th>`).join('')}
-  </tr></thead><tbody>`;
+  // Per-game rows
+  rdata.games.forEach((pair, i) => {
+    const [home,away] = pair;
+    const saved = (dbData[currentMathsRound]||{})[i]||{};
+    const winner = saved.winner||'';
+    const winnerName = winner==='home'?home : winner==='away'?away : '';
 
-  sorted.forEach(([p,tot],i) => {
-    html += `<tr class="ladder-row">
-      <td><span class="rank-badge rank-${i+1}">${i+1}</span><span class="player-name ${p}">${LABELS[p]}</span></td>
-      <td><span class="pts-total">${tot}</span></td>
-      ${playedRounds.map(rk=>`<td class="pts-cell">${byRound[rk]?.[p]??'—'}</td>`).join('')}
-    </tr>`;
-  });
-  html += `</tbody></table>`;
+    html += `<div class="maths-game">
+      <div class="maths-game-header">
+        <div class="maths-game-title">${home} vs ${away}</div>
+        <div class="maths-result-badge ${!winner?'none':''}">${winner ? '🏆 '+winnerName : 'Not played'}</div>
+      </div>
+      <div class="maths-players">`;
 
-  if (playedRounds.length) {
-    html += `<div class="round-breakdown"><h3>Round by Round</h3>`;
-    playedRounds.forEach(rk => {
-      const played = FIXTURE[rk].games.filter((_,i)=>(dbData[rk]||{})[i]?.winner).length;
-      const total = FIXTURE[rk].games.length;
-      html += `<div class="breakdown-card"><div class="breakdown-round">
-        <span>${rk} — ${played}/${total} results</span>
-        <div class="scorer-chips">
-          ${PLAYERS.map(p=>`<span class="chip ${p}">${LABELS[p]} ${byRound[rk]?.[p]??0}pts</span>`).join('')}
-        </div>
-      </div></div>`;
+    PLAYERS.forEach(p => {
+      const tip = saved[p]||'';
+      const tipName = tip==='home'?home : tip==='away'?away : '—';
+      const correct = winner && tip && tip===winner;
+      const wrong   = winner && tip && tip!==winner;
+      const pts = correct ? 2 : (wrong ? 0 : '');
+      const tipLabel = winner
+        ? (tip ? `Tipped ${tipName} ${correct?'✓':'✗'}` : 'No tip entered')
+        : (tip ? `Tipped ${tipName}` : 'No tip');
+
+      html += `<div class="maths-player-row">
+        <div class="maths-player-name ${p}">${LABELS[p]}</div>
+        <div class="maths-tip-label">${tipLabel}</div>
+        <input class="maths-pts-input" type="number" min="0" max="2" inputmode="numeric"
+          placeholder="?" data-correct="${pts}" data-game="${i}" data-player="${p}"
+          onchange="checkPtsInput(this)" value="">
+        <div class="maths-check-icon" id="icon-${i}-${p}"></div>
+      </div>`;
     });
-    html += `</div>`;
-  }
+
+    html += `</div></div>`;
+  });
+
+  // Weekly totals
+  html += `<div class="maths-totals-section">
+    <h3>Round Total</h3>
+    <p style="font-size:0.75rem;color:rgba(249,247,242,0.4);margin-bottom:14px">Add up all the points above for each person this round</p>
+    <div class="maths-totals-grid">`;
+
+  PLAYERS.forEach(p => {
+    // Calculate real total for this round
+    let realTotal = 0;
+    rdata.games.forEach((_,i) => {
+      const g = (dbData[currentMathsRound]||{})[i]||{};
+      if (g.winner && g[p] && g[p]===g.winner) realTotal+=2;
+    });
+    html += `<div class="maths-total-row">
+      <div class="maths-total-label ${p}">${LABELS[p]}</div>
+      <div class="maths-hint">= ? pts this round</div>
+      <input class="maths-total-input" type="number" min="0" inputmode="numeric"
+        placeholder="?" data-correct="${realTotal}" data-type="weekly" data-player="${p}"
+        onchange="checkTotalInput(this)" value="">
+      <div class="maths-check-icon" id="wticon-${p}"></div>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  // Running tally
+  // Calculate real running totals up to and including this round
+  const roundIdx = ROUND_KEYS.indexOf(currentMathsRound);
+  const prevRounds = ROUND_KEYS.slice(0, roundIdx+1);
+  const runningTotals = { mum:0, dad:0, jack:0 };
+  prevRounds.forEach(rk => {
+    FIXTURE[rk].games.forEach((_,i) => {
+      const g = (dbData[rk]||{})[i]||{};
+      if (g.winner) PLAYERS.forEach(p => { if (g[p]===g.winner) runningTotals[p]+=2; });
+    });
+  });
+
+  html += `<div class="maths-tally-section">
+    <h3>Running Total 🏆</h3>
+    <p>Add this round's points to the total from all previous rounds</p>
+    <div class="maths-tally-grid">`;
+
+  PLAYERS.forEach(p => {
+    html += `<div class="maths-tally-row">
+      <div class="maths-total-label ${p}">${LABELS[p]}</div>
+      <div class="maths-hint">= ? pts total</div>
+      <input class="maths-total-input" type="number" min="0" inputmode="numeric"
+        placeholder="?" data-correct="${runningTotals[p]}" data-type="running" data-player="${p}"
+        onchange="checkTotalInput(this)" value="">
+      <div class="maths-check-icon" id="rticon-${p}"></div>
+    </div>`;
+  });
+
+  html += `</div></div>`;
+  html += `<button class="check-all-btn" onclick="checkAll()">✅ Check All My Answers</button>`;
+  html += `<div class="maths-score-banner" id="mathsScoreBanner"></div>`;
 
   content.innerHTML = html;
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────
-function init() {
-  const sel = document.getElementById('roundSelect');
-  ROUND_KEYS.forEach(rk => {
-    const o = document.createElement('option');
-    o.value = rk; o.textContent = rk;
-    sel.appendChild(o);
-  });
-  sel.value = ROUND_KEYS[0];
-  currentRoundKey = ROUND_KEYS[0];
-
-  // Restore player
-  if (currentPlayer) {
-    const btn = document.querySelector(`.who-btn.${currentPlayer}`);
-    if (btn) btn.classList.add('active');
-  }
-
-  renderCurrentRound();
+function checkPtsInput(inp) {
+  const val = parseInt(inp.value);
+  const correct = parseInt(inp.dataset.correct);
+  const icon = document.getElementById(`icon-${inp.dataset.game}-${inp.dataset.player}`);
+  if (inp.value === '') { inp.className='maths-pts-input'; if(icon)icon.textContent=''; return; }
+  if (val === correct) { inp.className='maths-pts-input correct'; if(icon)icon.textContent='✅'; }
+  else                 { inp.className='maths-pts-input wrong';   if(icon)icon.textContent='❌'; }
 }
 
+function checkTotalInput(inp) {
+  const val = parseInt(inp.value);
+  const correct = parseInt(inp.dataset.correct);
+  const p = inp.dataset.player;
+  const type = inp.dataset.type;
+  const iconId = type==='weekly' ? `wticon-${p}` : `rticon-${p}`;
+  const icon = document.getElementById(iconId);
+  if (inp.value==='') { inp.className='maths-total-input'; if(icon)icon.textContent=''; return; }
+  if (val===correct) { inp.className='maths-total-input correct'; if(icon)icon.textContent='✅'; }
+  else               { inp.className='maths-total-input wrong';   if(icon)icon.textContent='❌'; }
+}
+
+function checkAll() {
+  let total=0, correct=0;
+  document.querySelectorAll('.maths-pts-input, .maths-total-input').forEach(inp => {
+    if (inp.value==='') return;
+    total++;
+    if (parseInt(inp.value)===parseInt(inp.dataset.correct)) correct++;
+  });
+  const banner = document.getElementById('mathsScoreBanner');
+  if (total===0) { banner.textContent='Fill in some answers first!'; banner.style.color='rgba(249,247,242,0.5)'; return; }
+  const pct = Math.round(correct/total*100);
+  if (pct===100) banner.innerHTML='🎉 Perfect score! Amazing maths!';
+  else if (pct>=70) banner.innerHTML=`⭐ Great work! ${correct} out of ${total} correct`;
+  else banner.innerHTML=`Keep trying! ${correct} out of ${total} correct — check the red ones again`;
+  banner.style.color = pct===100 ? 'var(--correct)' : pct>=70 ? 'var(--gold)' : 'var(--wrong)';
+}
+
+// ── LADDER ────────────────────────────────────────────────────────────────
+async function renderLadder() {
+  const content = document.getElementById('ladderContent');
+  content.innerHTML='<div class="loading"><div class="spinner"></div><br>Loading ladder…</div>';
+  await loadAllTips();
+  const totals={mum:0,dad:0,jack:0}; const byRound={};
+  ROUND_KEYS.forEach(rk=>{ const rnd={mum:0,dad:0,jack:0}; FIXTURE[rk].games.forEach((_,i)=>{ const g=(dbData[rk]||{})[i]||{}; if(!g.winner)return; PLAYERS.forEach(p=>{if(g[p]===g.winner){rnd[p]+=2;totals[p]+=2;}}); }); byRound[rk]=rnd; });
+  const hasData=ROUND_KEYS.some(rk=>FIXTURE[rk].games.some((_,i)=>(dbData[rk]||{})[i]?.winner));
+  if (!hasData) { content.innerHTML=`<div class="empty-state"><span class="big-emoji">🏉</span><p>No results yet!</p></div>`; return; }
+  const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  const playedRounds=ROUND_KEYS.filter(rk=>FIXTURE[rk].games.some((_,i)=>(dbData[rk]||{})[i]?.winner));
+  let html=`<table class="ladder-table"><thead><tr><th>Tipper</th><th>Total</th>${playedRounds.map(rk=>`<th style="font-size:0.62rem">${rk.replace('Round ','R')}</th>`).join('')}</tr></thead><tbody>`;
+  sorted.forEach(([p,tot],i)=>{ html+=`<tr class="ladder-row"><td><span class="rank-badge rank-${i+1}">${i+1}</span><span class="player-name ${p}">${LABELS[p]}</span></td><td><span class="pts-total">${tot}</span></td>${playedRounds.map(rk=>`<td class="pts-cell">${byRound[rk]?.[p]??'—'}</td>`).join('')}</tr>`; });
+  html+=`</tbody></table>`;
+  if (playedRounds.length) {
+    html+=`<div class="round-breakdown"><h3>Round by Round</h3>`;
+    playedRounds.forEach(rk=>{ const played=FIXTURE[rk].games.filter((_,i)=>(dbData[rk]||{})[i]?.winner).length; const total=FIXTURE[rk].games.length; html+=`<div class="breakdown-card"><div class="breakdown-round"><span>${rk} — ${played}/${total} results</span><div class="scorer-chips">${PLAYERS.map(p=>`<span class="chip ${p}">${LABELS[p]} ${byRound[rk]?.[p]??0}pts</span>`).join('')}</div></div></div>`; });
+    html+=`</div>`;
+  }
+  content.innerHTML=html;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+function init() {
+  ['tipsRoundSelect','mathsRoundSelect'].forEach(id => {
+    const sel=document.getElementById(id);
+    ROUND_KEYS.forEach(rk=>{ const o=document.createElement('option'); o.value=rk; o.textContent=rk; sel.appendChild(o); });
+    sel.value=ROUND_KEYS[0];
+  });
+  if (currentPlayer) { const btn=document.querySelector(`.who-btn.${currentPlayer}`); if(btn)btn.classList.add('active'); }
+  renderTipsRound();
+}
 init();
 </script>
 </body>
